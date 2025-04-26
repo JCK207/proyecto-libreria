@@ -34,6 +34,9 @@ public class Control {
                 case "Vender libro":
                     venderLibro();
                     break;
+                case "Mostrar libros":
+                    mostrarLibrosAgregados();
+                    break;
                 case "Salir":
                     
                     break;
@@ -46,6 +49,11 @@ public class Control {
     }
     private void agregarCantidadUnidadesDeLibro() {
         objV.mostrarTexto("\nIngresó a la opción 2: Agregar unidades a un libro");
+        mostrarLibrosAgregados();
+        if (librosAgregados.length==0) {
+            objV.mostrarTexto("No hay libros agregados.");
+            return;
+        }
         String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
         int cantidad = objV.pedirEntero("Ingrese la cantidad de unidades a agregar: ");
         if (cantidad<=0) {

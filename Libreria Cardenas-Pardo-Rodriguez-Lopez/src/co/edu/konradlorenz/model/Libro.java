@@ -38,8 +38,7 @@ public abstract class Libro {
     public String toString() {
         return "Libro{" + "isbn=" + isbn + ", titulo=" + titulo + ", precio=" + precio + '}';
     }
-    
-    ArrayList<Libro> libros = new ArrayList<>();
+
     public void agregarUnidades(int cantidad) {
         if (cantidad > 0) {
             cantidadDisponible += cantidad;
