@@ -23,16 +23,16 @@ public class Control {
                     agregarLibroMenu();
                     break;
                 case "Agregar unidades a un libro":
-                    
+                    agregarCantidadUnidadesDeLibro();
                     break;
                 case "Cambiar libro de posición":
-                    
+                    cambiarPosicionLibro();
                     break;
                 case "Retirar libro":
-                    
+                    retirarLibro();
                     break;
                 case "Vender libro":
-                    
+                    venderLibro();
                     break;
                 case "Salir":
                     
@@ -43,6 +43,25 @@ public class Control {
             }
         objV.mostrarTexto("");
         } while (!opcion.equalsIgnoreCase("Salir"));
+    }
+    private void agregarCantidadUnidadesDeLibro() {
+        objV.mostrarTexto("\nIngresó a la opción 2: Agregar unidades a un libro");
+        String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
+        int cantidad = objV.pedirEntero("Ingrese la cantidad de unidades a agregar: ");
+        if (cantidad<=0) {
+            objV.mostrarTexto("La cantidad debe ser mayor a 0.");
+            return;
+        }
+        
+        for (Libro libro : librosAgregados) {
+            if (libro!=null && libro.getIsbn().equals(isbn)) {
+                libro.agregarUnidades(cantidad);
+                objV.mostrarTexto("Se agregaron "+cantidad+" unidades al libro con ISBN "+isbn);
+                return;
+            }
+        }
+        
+        objV.mostrarTexto("No se encontró el libro con ISBN "+isbn);
     }
     
     private void agregarLibroMenu() {
@@ -94,6 +113,55 @@ public class Control {
         } else {
             librosAgregados[primerEspacio] = libro;
         }
+    }
+    private void cambiarPosicionLibro() {
+        objV.mostrarTexto("\nIngresó a la opción 3: Cambiar libro de posición");
+        String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
+        int nuevaPos = objV.pedirEntero("Ingrese la nueva posición (0-"+(librosAgregados.length-1)+"): ");
+        if (nuevaPos<0 || nuevaPos>=librosAgregados.length) {
+            objV.mostrarTexto("La posición debe ser un número entre 0 y "+(librosAgregados.length-1));
+            return;
+        }
+        
+        for (int i=0; i<librosAgregados.length; i++) {
+            if (librosAgregados[i]!=null && librosAgregados[i].getIsbn().equals(isbn)) {
+                Libro aux = librosAgregados[nuevaPos];
+                librosAgregados[nuevaPos] = librosAgregados[i];
+                librosAgregados[i] = aux;
+                objV.mostrarTexto("Se cambió el libro con ISBN "+isbn+" a la posición "+nuevaPos);
+                return;
+            }
+        }
+        
+        objV.mostrarTexto("No se encontró el libro con ISBN "+isbn);
+    }
+    private void retirarLibro() {
+        objV.mostrarTexto("\nIngresó a la opción 4: Retirar libro");
+        String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
+        
+        for (int i=0; i<librosAgregados.length; i++) {
+            if (librosAgregados[i]!=null && librosAgregados[i].getIsbn().equals(isbn)) {
+                librosAgregados[i] = null;
+                objV.mostrarTexto("Se retiró el libro con ISBN "+isbn);
+                return;
+            }
+        }
+        
+        objV.mostrarTexto("No se encontró el libro con ISBN "+isbn);
+    }
+    private void venderLibro() {
+        objV.mostrarTexto("\nIngresó a la opción 5: Vender libro");
+        String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
+        
+        for (int i=0; i<librosAgregados.length; i++) {
+            if (librosAgregados[i]!=null && librosAgregados[i].getIsbn().equals(isbn)) {
+                librosAgregados[i].vender();
+                objV.mostrarTexto("Se vendió el libro con ISBN "+isbn);
+                return;
+            }
+        }
+        
+        objV.mostrarTexto("No se encontró el libro con ISBN "+isbn);
     }
     
     private Libro crearLibroFisico() {

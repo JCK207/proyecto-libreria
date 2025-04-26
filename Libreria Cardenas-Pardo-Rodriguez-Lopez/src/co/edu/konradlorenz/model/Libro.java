@@ -1,5 +1,8 @@
 package co.edu.konradlorenz.model;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public abstract class Libro {
     protected String isbn, titulo, razonDescuento;
     protected double precio, precioDescuento;
@@ -36,6 +39,14 @@ public abstract class Libro {
         return "Libro{" + "isbn=" + isbn + ", titulo=" + titulo + ", precio=" + precio + '}';
     }
     
+    ArrayList<Libro> libros = new ArrayList<>();
+    public void agregarUnidades(int cantidad) {
+        if (cantidad > 0) {
+            cantidadDisponible += cantidad;
+        } else {
+            System.out.println("La cantidad debe ser mayor a 0.");
+        }
+    }
     //implemetación propia en cada subclase
     protected double calcularDescuento() {
         razonDescuento = "sin descuento";
