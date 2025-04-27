@@ -4,18 +4,25 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Ventana {
-    private Scanner sc = new Scanner(System.in);
+    private static Scanner sc = new Scanner(System.in);
 
-    public void mostrarTexto(String txt) {
+    public static void mostrarTexto(String txt) {
         System.out.println(txt);
     }
 
-    public String pedirTexto(String txt) {
-        System.out.print(txt);
-        return sc.nextLine();
+    public static String pedirTexto(String txt) {
+        String s;
+        do {
+            System.out.print(txt);
+            s = sc.nextLine();
+            if (s.isBlank()) {
+                System.out.println("El texto no puede estar en blanco.\n");
+            }
+        } while (s.isBlank());
+        return s;
     }
 
-    public int pedirEntero(String txt) {
+    public static int pedirEntero(String txt) {
         while (true) {
             try {
                 System.out.print(txt);
@@ -23,23 +30,10 @@ public class Ventana {
                 sc.nextLine();
                 return n;
             } catch (InputMismatchException e) {
-                System.out.println("Valor numérico inválido.");
+                System.out.println("Valor numérico inválido.\n");
                 sc.nextLine();
             }
         }
     }
     
-    public double pedirDouble(String txt) {
-        while (true) {
-            try {
-                System.out.print(txt);
-                double n = sc.nextDouble();
-                sc.nextLine();
-                return n;
-            } catch(InputMismatchException e) {
-                System.out.println("Valor numérico inválido.");
-                sc.nextLine();
-            }
-        }
-    }
 }

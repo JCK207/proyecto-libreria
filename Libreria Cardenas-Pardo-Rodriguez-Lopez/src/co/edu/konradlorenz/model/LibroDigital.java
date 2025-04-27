@@ -11,21 +11,23 @@ public class LibroDigital extends Libro {
     }
 
     @Override
-    protected double calcularDescuento() {
+    protected double calcularPrecioFinal() {
         double descuento = 0;
-        razonDescuento = "sin descuento";
+        razonPrecioFinal = "sin descuento";
         
-        /*
-        implementación del condicional para modificar descuento y razonDescuento
-        */
+        //puede modificarse la condición
+        if (true) {
+            descuento = 0.1;
+            razonPrecioFinal = descuento*100+"% descuento digital";
+        }
         
-        return descuento;
+        return precio -precio*descuento;
     }
     
     @Override
     public String obtenerInfoCreacion() {
         return "[LIBRO DIGITAL] ISBN: "+isbn+" | Título: "+titulo
                 +"\nPrecio base: $"+String.format("%.2f", precio)+"| Formato: "+formato+" | Tamaño: "+tamanno+"MB"
-                +"\nLicencias Disponibles: "+cantidadDisponible+" | Precio final: $"+String.format("%.2f", precioDescuento)+" ("+razonDescuento+")";
+                +"\nLicencias Disponibles: "+cantidadDisponible+" | Precio final: $"+String.format("%.2f", precioFinal)+" ("+razonPrecioFinal+")";
     }
 }

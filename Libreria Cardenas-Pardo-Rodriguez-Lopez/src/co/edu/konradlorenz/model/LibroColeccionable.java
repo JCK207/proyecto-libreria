@@ -12,21 +12,23 @@ public class LibroColeccionable extends Libro {
     }
 
     @Override
-    protected double calcularDescuento() {
-        double descuento = 0;
-        razonDescuento = "sin descuento";
+    protected double calcularPrecioFinal() {
+        double prima = 0;
+        razonPrecioFinal = "sin prima coleccionable";
         
-        /*
-        implementación del condicional para modificar descuento y razonDescuento
-        */
+        //puede modificarse la condición
+        if (true) {
+            prima = 0.1;
+            razonPrecioFinal = "incluye "+prima*100+"% prima coleccionable";
+        }
         
-        return descuento;
+        return precio + precio*prima;
     }
     
     @Override
     public String obtenerInfoCreacion() {
         return "[COLECCIONABLE] ISBN: "+isbn+" | Título: "+titulo
                 +"\nPrecio base: $"+String.format("%.2f", precio)+"| Peso: "+peso+"kg | Edición: "+edAct+"/"+edTot
-                +"\nUnidades: "+cantidadDisponible+" | Precio final: $"+String.format("%.2f", precioDescuento)+" ("+razonDescuento+")";
+                +"\nUnidades: "+cantidadDisponible+" | Precio final: $"+String.format("%.2f", precioFinal)+" ("+razonPrecioFinal+")";
     }
 }

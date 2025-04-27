@@ -1,19 +1,15 @@
 package co.edu.konradlorenz.model;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 public abstract class Libro {
-    protected String isbn, titulo, razonDescuento;
-    protected double precio, precioDescuento;
-    protected int cantidadDisponible = 0, cantidadVendida = 0;
+    protected String isbn, titulo, razonPrecioFinal;
+    protected double precio, precioFinal;
+    protected int cantidadDisponible = 1, cantidadVendida = 0;
 
     public Libro(String isbn, String titulo, double precio) {
         this.isbn = isbn;
         this.titulo = titulo;
         this.precio = precio;
-        precioDescuento = precio -precio*calcularDescuento();
-        cantidadDisponible++;
+        precioFinal = calcularPrecioFinal();
     }
     
     public String getIsbn() {
@@ -25,6 +21,12 @@ public abstract class Libro {
     public double getPrecio() {
         return precio;
     }
+    public int getCantidadDisponible() {
+        return cantidadDisponible;
+    }
+    public int getCantidadVendida() {
+        return cantidadVendida;
+    }
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
@@ -34,31 +36,30 @@ public abstract class Libro {
     public void setPrecio(double precio) {
         this.precio = precio;
     }
+    public void setCantidadDisponible(int cantidadDisponible) {
+        this.cantidadDisponible = cantidadDisponible;
+    }
+    public void setCantidadVendida(int cantidadVendida) {
+        this.cantidadVendida = cantidadVendida;
+    }
     @Override
     public String toString() {
-        return "Libro{" + "isbn=" + isbn + ", titulo=" + titulo + ", precio=" + precio + '}';
+        return "Libro{" + "isbn=" + isbn + ", titulo=" + titulo + ", precio=" + precio + ", cantidadDisponible=" + cantidadDisponible + ", cantidadVendida=" + cantidadVendida + '}';
     }
 
-    public void agregarUnidades(int cantidad) {
-        if (cantidad > 0) {
-            cantidadDisponible += cantidad;
-        } else {
-            System.out.println("La cantidad debe ser mayor a 0.");
-        }
-    }
     //implemetación propia en cada subclase
-    protected double calcularDescuento() {
-        razonDescuento = "sin descuento";
-        return 0;
+    protected double calcularPrecioFinal() {
+        razonPrecioFinal = "sin descuento";
+        return precio;
     }
     
-    public void vender() {
-        /*
-        implementación del código;
-        */
-        
-        cantidadDisponible--;
-        cantidadVendida++;
+    public void agregarUnidades(int unidades) {
+        cantidadDisponible += unidades;
+    }
+    
+    public void vender(int unidades) {
+        cantidadDisponible -= unidades;
+        cantidadVendida += unidades;
     }
     
     public abstract String obtenerInfoCreacion();

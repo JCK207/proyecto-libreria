@@ -9,21 +9,22 @@ public class LibroFisico extends Libro {
     }
 
     @Override
-    protected double calcularDescuento() {
+    protected double calcularPrecioFinal() {
         double descuento = 0;
-        razonDescuento = "sin descuento";
+        razonPrecioFinal = "sin descuento";
         
-        /*
-        implementación del condicional para modificar descuento y razonDescuento
-        */
+        //puede modificarse la condición y su cuerpo
+        if (true) {
+            
+        }
         
-        return descuento;
+        return precio -precio*descuento;
     }
     
     @Override
     public String obtenerInfoCreacion() {
         return "[LIBRO FÍSICO] ISBN: "+isbn+" | Título: "+titulo
                 +"\nPrecio base: $"+String.format("%.2f", precio)+"| Peso: "+peso+"kg"
-                +"\nUnidades disponible: "+cantidadDisponible+" | Precio final: $"+String.format("%.2f", precioDescuento)+" ("+razonDescuento+")";
+                +"\nUnidades disponible: "+cantidadDisponible+" | Precio final: $"+String.format("%.2f", precioFinal)+" ("+razonPrecioFinal+")";
     }
 }

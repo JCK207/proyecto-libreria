@@ -4,13 +4,12 @@ import co.edu.konradlorenz.model.*;
 import co.edu.konradlorenz.view.*;
 
 public class Control {
-    private Libro[] librosAgregados = new Libro[0];
-    private Ventana objV = new Ventana();
+    private Libreria libreria = new Libreria();
     
     public void run() {
         String opcion;
         do {
-            opcion = objV.pedirTexto("Menu de usuario."
+            opcion = Ventana.pedirTexto("Menu de usuario."
                     +"\n  Agregar libro."
                     +"\n  Agregar unidades a un libro."
                     +"\n  Retirar libro."
@@ -19,62 +18,49 @@ public class Control {
                     +"\n  Salir."
                     +"\nSeleccione una opción: ");
             switch (opcion) {
-                case "Agregar libro":
+                case "1":
+                //case "Agregar libro":
                     agregarLibroMenu();
                     break;
-                case "Agregar unidades a un libro":
-                    agregarCantidadUnidadesDeLibro();
+                case "2":
+                //case "":
+                    if (!agregarUnidadesLibroMenu()) {
+                        Ventana.mostrarTexto("Cancelación de Agregar unidades a un libro.");
+                    }
                     break;
-                case "Cambiar libro de posición":
-                    cambiarPosicionLibro();
+                case "3":
+                //case "Retirar libro":
+                    if (!retirarLibroMenu()) {
+                        Ventana.mostrarTexto("Cancelación de Retirar libro.");
+                    }
                     break;
-                case "Retirar libro":
-                    retirarLibro();
+                case "4":
+                //case "Cambiar libro de posición":
+                    if (!cambiarPosicionLibroMenu()) {
+                        Ventana.mostrarTexto("Cancelación de Cambiar libro de posición.");
+                    }
                     break;
-                case "Vender libro":
-                    venderLibro();
+                case "5":
+                //case "Vender libro":
+                    if (!venderLibroMenu()) {
+                        Ventana.mostrarTexto("Cancelación de Vender libro.");
+                    }
                     break;
-                case "Mostrar libros":
-                    mostrarLibrosAgregados();
-                    break;
-                case "Salir":
-                    
+                case "0":
+                //case "Salir":
+                    Ventana.mostrarTexto("Saliendo.");
                     break;
                 default: {
-                    objV.mostrarTexto("Opción inválida, ingrésela textualmente.");
+                    Ventana.mostrarTexto("Opción inválida, ingrésela textualmente.");
                 }
             }
-        objV.mostrarTexto("");
+        Ventana.mostrarTexto("");
         } while (!opcion.equalsIgnoreCase("Salir"));
-    }
-    private void agregarCantidadUnidadesDeLibro() {
-        objV.mostrarTexto("\nIngresó a la opción 2: Agregar unidades a un libro");
-        mostrarLibrosAgregados();
-        if (librosAgregados.length==0) {
-            objV.mostrarTexto("No hay libros agregados.");
-            return;
-        }
-        String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
-        int cantidad = objV.pedirEntero("Ingrese la cantidad de unidades a agregar: ");
-        if (cantidad<=0) {
-            objV.mostrarTexto("La cantidad debe ser mayor a 0.");
-            return;
-        }
-        
-        for (Libro libro : librosAgregados) {
-            if (libro!=null && libro.getIsbn().equals(isbn)) {
-                libro.agregarUnidades(cantidad);
-                objV.mostrarTexto("Se agregaron "+cantidad+" unidades al libro con ISBN "+isbn);
-                return;
-            }
-        }
-        
-        objV.mostrarTexto("No se encontró el libro con ISBN "+isbn);
     }
     
     private void agregarLibroMenu() {
-        objV.mostrarTexto("\nIngresó a la opción 1: Agregar libro");
-        int opcionB = objV.pedirEntero("Seleccione el tipo de libro:"
+        Ventana.mostrarTexto("\nIngresó a la opción 1: Agregar libro");
+        int opcionB = Ventana.pedirEntero("Seleccione el tipo de libro:"
                 +"\n1. Libro Físico"
                 +"\n2. Libro Digital"
                 +"\n3. Libro Coleccionable"
@@ -84,110 +70,198 @@ public class Control {
         switch (opcionB) {
             case 1:
                 tipo = "físico";
+                Ventana.mostrarTexto("");
                 libro = crearLibroFisico();
                 break;
             case 2:
                 tipo = "digital";
+                Ventana.mostrarTexto("");
                 libro = crearLibroDigital();
                 break;
             case 3:
                 tipo = "coleccionable";
+                Ventana.mostrarTexto("");
                 libro = crearLibroColeccionable();
                 break;
             default:
-                objV.mostrarTexto("Opción inválida.");
+                Ventana.mostrarTexto("Opción inválida.");
                 return;
         }
         if (libro==null) {
-            objV.mostrarTexto("Cancelación de Agregar libro.");
+            Ventana.mostrarTexto("Cancelación de Agregar libro.");
             return;
         }
         
-        agregarLibro(libro);
-        objV.mostrarTexto("\nSe agregó el libro "+tipo+":"
+        libreria.agregarLibro(libro);
+        Ventana.mostrarTexto("\nSe agregó el libro "+tipo+":"
                 +"\n"+libro.obtenerInfoCreacion());
     }
     
-    private void agregarLibro(Libro libro) {
-        int primerEspacio = verificarEspacio();
-        if (primerEspacio==-1) {
-            Libro[] aux = librosAgregados;
-            librosAgregados = new Libro[aux.length+1];
-            for (int i=0; i<aux.length; i++) {
-                librosAgregados[i] = aux[i];
-            }
+    
+    private boolean agregarUnidadesLibroMenu() {
+        boolean sinError = false;
+        Ventana.mostrarTexto("\nIngresó a la opción 2: Agregar unidades a un libro");
+        if (!mostrarLibrosAgregados()) {
+            Ventana.mostrarTexto("No hay ningún libro agregado.");
+            return sinError;
+        }
+        
+        String[] info = Ventana.pedirTexto("Ingrese los datos separados por & (libro&unidades):\n").split("&");
+        if (info.length!=2) {
+            Ventana.mostrarTexto("La cadena debe de ser de 2 datos separados por & pero hay: "+info.length);
+            return sinError;
+        }
+        int indice, unidades;
+        Libro libro;
+        
+        try {
+            indice = Integer.parseInt(info[0])-1;
+            unidades = Integer.parseInt(info[1]);
+            libro = libreria.agregarUnidadesLibro(indice, unidades);
             
-            librosAgregados[librosAgregados.length-1] = libro;
-        } else {
-            librosAgregados[primerEspacio] = libro;
+            sinError = true;
+            Ventana.mostrarTexto("Se agregaron "+unidades+" unidades al libro "+(indice+1)+":"
+                    +"\n"+libro);
+        } catch (NumberFormatException e) {
+            Ventana.mostrarTexto("Algún valor numérico está con otro formato.");
+        } catch (LibroNullException e) {
+            Ventana.mostrarTexto(e.getMessage());
+        } catch (CantidadDeUnidadesException e) {
+            Ventana.mostrarTexto(e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            Ventana.mostrarTexto("El índice es inválido.");
+        } finally {
+            return sinError;
         }
-    }
-    private void cambiarPosicionLibro() {
-        objV.mostrarTexto("\nIngresó a la opción 3: Cambiar libro de posición");
-        String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
-        int nuevaPos = objV.pedirEntero("Ingrese la nueva posición (0-"+(librosAgregados.length-1)+"): ");
-        if (nuevaPos<0 || nuevaPos>=librosAgregados.length) {
-            objV.mostrarTexto("La posición debe ser un número entre 0 y "+(librosAgregados.length-1));
-            return;
-        }
-        
-        for (int i=0; i<librosAgregados.length; i++) {
-            if (librosAgregados[i]!=null && librosAgregados[i].getIsbn().equals(isbn)) {
-                Libro aux = librosAgregados[nuevaPos];
-                librosAgregados[nuevaPos] = librosAgregados[i];
-                librosAgregados[i] = aux;
-                objV.mostrarTexto("Se cambió el libro con ISBN "+isbn+" a la posición "+nuevaPos);
-                return;
-            }
-        }
-        
-        objV.mostrarTexto("No se encontró el libro con ISBN "+isbn);
-    }
-    private void retirarLibro() {
-        objV.mostrarTexto("\nIngresó a la opción 4: Retirar libro");
-        String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
-        
-        for (int i=0; i<librosAgregados.length; i++) {
-            if (librosAgregados[i]!=null && librosAgregados[i].getIsbn().equals(isbn)) {
-                librosAgregados[i] = null;
-                objV.mostrarTexto("Se retiró el libro con ISBN "+isbn);
-                return;
-            }
-        }
-        
-        objV.mostrarTexto("No se encontró el libro con ISBN "+isbn);
-    }
-    private void venderLibro() {
-        objV.mostrarTexto("\nIngresó a la opción 5: Vender libro");
-        String isbn = objV.pedirTexto("Ingrese el ISBN del libro: ");
-        
-        for (int i=0; i<librosAgregados.length; i++) {
-            if (librosAgregados[i]!=null && librosAgregados[i].getIsbn().equals(isbn)) {
-                librosAgregados[i].vender();
-                objV.mostrarTexto("Se vendió el libro con ISBN "+isbn);
-                return;
-            }
-        }
-        
-        objV.mostrarTexto("No se encontró el libro con ISBN "+isbn);
     }
     
+    private boolean retirarLibroMenu() {
+        boolean sinError = false;
+        Ventana.mostrarTexto("\nIngresó a la opción 3: Retirar libro");
+        if (!mostrarLibrosAgregados()) {
+            Ventana.mostrarTexto("No hay ningún libro agregado.");
+            return sinError;
+        }
+        
+        String info = Ventana.pedirTexto("Ingrese el número de libro que desea retirar:\n");
+        int indice;
+        Libro libro;
+        
+        try {
+            indice = Integer.parseInt(info)-1;
+            libro = libreria.retirarLibro(indice);
+            
+            sinError = true;
+            Ventana.mostrarTexto("Se retiró el libro "+(indice+1)+":"
+                    +"\n"+libro);
+        } catch (NumberFormatException e) {
+            Ventana.mostrarTexto("Algún valor numérico está con otro formato.");
+        } catch (LibroNullException e) {
+            Ventana.mostrarTexto(e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            Ventana.mostrarTexto("El índice es inválido.");
+        } finally {
+            return sinError;
+        }
+    }
+    
+    private boolean cambiarPosicionLibroMenu() {
+        boolean sinError = false;
+        Ventana.mostrarTexto("\nIngresó a la opción 4: Cambiar libro de posición");
+        if (!mostrarLibrosAgregados()) {
+            Ventana.mostrarTexto("No hay ningún libro agregado.");
+            return sinError;
+        }
+        
+        String[] info = Ventana.pedirTexto("Ingrese los datos separados por & (libro a cambiar&nuevo espacio):\n").split("&");
+        if (info.length!=2) {
+            Ventana.mostrarTexto("La cadena debe de ser de 2 datos separados por & pero hay: "+info.length);
+            return sinError;
+        }
+        
+        try {
+            int origen = Integer.parseInt(info[0])-1;
+            int destino = Integer.parseInt(info[1])-1;
+            libreria.moverLibro(origen, destino);
+            
+            sinError = true;
+            Ventana.mostrarTexto("Se cambió el libro de posición.");
+        } catch (NumberFormatException e) {
+            Ventana.mostrarTexto("Algún valor numérico está con otro formato.");
+        } catch (LibroNullException e) {
+            Ventana.mostrarTexto(e.getMessage());
+        } catch (EspacioOcupadoException e) {
+            Ventana.mostrarTexto(e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            Ventana.mostrarTexto("Algún índice es inválido.");
+        } finally {
+            return sinError;
+        }
+    }
+    
+    private boolean venderLibroMenu() {
+        boolean sinError = false;
+        Ventana.mostrarTexto("\nIngresó a la opción 5: Vender libro");
+        if (!mostrarLibrosAgregados()) {
+            Ventana.mostrarTexto("No hay ningún libro agregado.");
+            return sinError;
+        }
+        
+        String[] info = Ventana.pedirTexto("Ingrese los datos separados por & (libro&cantidad a comprar):\n").split("&");
+        if (info.length!=2) {
+            Ventana.mostrarTexto("La cadena debe de ser de 2 datos separados por & pero hay: "+info.length);
+            return sinError;
+        }
+        int indice, unidades;
+        Libro libro;
+        
+        try {
+            indice = Integer.parseInt(info[0])-1;
+            unidades = Integer.parseInt(info[1]);
+            //libro = libreria.getLibros()[indice];//
+            //Ventana.mostrarTexto(libro.toString());//
+            libro = libreria.venderLibro(indice, unidades);
+            //Ventana.mostrarTexto(libro.toString());//
+            
+            sinError = true;
+            Ventana.mostrarTexto("Se vendieron "+unidades+" unidades del libro "+(indice+1)+":"
+                +"\n"+libro);
+        } catch (NumberFormatException e) {
+            Ventana.mostrarTexto("Algún valor numérico está con otro formato.");
+        } catch (LibroNullException e) {
+            Ventana.mostrarTexto(e.getMessage());
+        } catch (CantidadDeUnidadesException e) {
+            Ventana.mostrarTexto(e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            Ventana.mostrarTexto("El índice es inválido.");
+        } finally {
+            return sinError;
+        }
+        
+    }
+    
+    
     private Libro crearLibroFisico() {
-        String entrada = objV.pedirTexto("\nIngrese los datos separados por & (isbn&título&precio&pesoKg)\n");
+        String entrada = Ventana.pedirTexto("Ingrese los datos separados por & (isbn&título&precio&pesoKg)\n");
         String[] info = entrada.split("&");
         if (info.length!=4) {
-            objV.mostrarTexto("La cadena debe ser de 4 datos separados por & pero hay: "+info.length);
+            Ventana.mostrarTexto("La cadena debe ser de 4 datos separados por & pero hay: "+info.length);
             return null;
         }
         
         double precio;
         double peso;
         String isbn = info[0], titulo = info[1];
+        if(isbn.isBlank() || titulo.isBlank()) {
+            Ventana.mostrarTexto("Ningún texto puede estar en blanco.");
+            return null;
+        }
+        
         try {
             precio = Double.parseDouble(info[2]);
             peso = Double.parseDouble(info[3]);
         } catch (NumberFormatException e) {
-            objV.mostrarTexto("Algún valor numérico es inválido.");
+            Ventana.mostrarTexto("Algún valor numérico es inválido.");
             return null;
         }
         
@@ -195,21 +269,26 @@ public class Control {
     }
     
     private Libro crearLibroDigital() {
-        String entrada = objV.pedirTexto("\nIngrese los datos separados por & (isbn&título&precio&formato&tamañoMB)\n");
+        String entrada = Ventana.pedirTexto("Ingrese los datos separados por & (isbn&título&precio&formato&tamañoMB)\n");
         String[] info = entrada.split("&");
         if (info.length!=5) {
-            objV.mostrarTexto("La cadena debe ser de 5 datos separados por & pero hay: "+info.length);
+            Ventana.mostrarTexto("La cadena debe ser de 5 datos separados por & pero hay: "+info.length);
             return null;
         }
         
         double precio;
         double tamanno;
         String isbn = info[0], titulo = info[1], formato = info[3];
+        if(isbn.isBlank() || titulo.isBlank() || formato.isBlank()) {
+            Ventana.mostrarTexto("Ningún texto puede estar en blanco.");
+            return null;
+        }
+        
         try {
             precio = Double.parseDouble(info[2]);
             tamanno = Double.parseDouble(info[4]);
         } catch (NumberFormatException e) {
-            objV.mostrarTexto("Algún valor numérico es inválido.");
+            Ventana.mostrarTexto("Algún valor numérico es inválido.");
             return null;
         }
         
@@ -217,61 +296,62 @@ public class Control {
     }
     
     private Libro crearLibroColeccionable() {
-        String entrada = objV.pedirTexto("\nIngrese los datos separados por & (isbn&título&precio&pesoKg&edición(actual/total))\n");
+        String entrada = Ventana.pedirTexto("Ingrese los datos separados por & (isbn&título&precio&pesoKg&edición(actual/total))\n");
         String[] info = entrada.split("&");
         if (info.length!=5) {
-            objV.mostrarTexto("La cadena debe ser de 5 datos separados por & pero hay: "+info.length);
+            Ventana.mostrarTexto("La cadena debe ser de 5 datos separados por & pero hay: "+info.length);
             return null;
         }
         
         double precio;
         double peso;
-        
         String[] aux = info[4].split("/");
         if (aux.length!=2) {
-            objV.mostrarTexto("La edición debe ser de 2 datos separados por / pero hay: "+aux.length);
+            Ventana.mostrarTexto("La edición debe ser de 2 datos separados por / pero hay: "+aux.length);
             return null;
         }
         int edAct, edTot;
         String isbn = info[0], titulo = info[1];
+        if(isbn.isBlank() || titulo.isBlank()) {
+            Ventana.mostrarTexto("Ningún texto puede estar en blanco.");
+            return null;
+        }
+        
         try {
             precio = Double.parseDouble(info[2]);
             peso = Double.parseDouble(info[3]);
             edAct = Integer.parseInt(aux[0]);
             edTot = Integer.parseInt(aux[1]);
             if (edAct<=0 || edTot<=0 || edAct>edTot) {
-                objV.mostrarTexto("La edición debe ser de 2 números naturales, el segundo mayor al primero");
+                Ventana.mostrarTexto("La edición debe ser de 2 números naturales, el segundo mayor al primero");
                 return null;
             }
         } catch (NumberFormatException e) {
-            objV.mostrarTexto("Algún valor numérico es inválido.");
+            Ventana.mostrarTexto("Algún valor numérico es inválido.");
             return null;
         }
         
         return new LibroColeccionable(isbn, titulo, precio, peso, edAct, edTot);
     }
     
-    private int verificarEspacio() {
-        int primerEspacio = -1;
-        boolean hayEspacio = false;
-        int i = 0;
-        while (i<librosAgregados.length && !hayEspacio) {
-            if (librosAgregados[i]==null) {
-                hayEspacio = true;
-                primerEspacio = i;
-            }
-            i++;
-        }
-        return primerEspacio;
-    }
     
-    private void mostrarLibrosAgregados() {
-        for (Libro agregado : librosAgregados) {
+    private boolean mostrarLibrosAgregados() {
+        boolean sinError = false;
+        if (libreria.isEmpty()) {
+            return sinError;
+        }
+        
+        Ventana.mostrarTexto("Libros:");
+        for (Libro agregado : libreria.getLibros()) {
             if (agregado==null) {
-                objV.mostrarTexto("Espacio disponible.");
+                Ventana.mostrarTexto("Espacio disponible.");
             } else {
-                objV.mostrarTexto(agregado.toString());
+                Ventana.mostrarTexto(agregado.toString());
             }
         }
+        Ventana.mostrarTexto("");
+        
+        sinError = true;
+        return sinError;
     }
 }
