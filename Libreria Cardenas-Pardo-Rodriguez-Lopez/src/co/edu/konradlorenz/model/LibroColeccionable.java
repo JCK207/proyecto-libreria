@@ -12,7 +12,7 @@ public class LibroColeccionable extends Libro {
     }
 
     @Override
-    protected double calcularPrecioFinal() {
+    public double calcularPrecioFinal() {
         double prima = 0;
         razonPrecioFinal = "sin prima coleccionable";
         

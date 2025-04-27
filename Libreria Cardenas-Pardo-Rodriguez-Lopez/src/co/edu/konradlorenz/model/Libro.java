@@ -1,6 +1,6 @@
 package co.edu.konradlorenz.model;
 
-public abstract class Libro {
+public abstract class Libro implements ModificablePrecio {
     protected String isbn, titulo, razonPrecioFinal;
     protected double precio, precioFinal;
     protected int cantidadDisponible = 1, cantidadVendida = 0;
@@ -47,12 +47,6 @@ public abstract class Libro {
         return "Libro{" + "isbn=" + isbn + ", titulo=" + titulo + ", precio=" + precio + ", cantidadDisponible=" + cantidadDisponible + ", cantidadVendida=" + cantidadVendida + '}';
     }
 
-    //implemetación propia en cada subclase
-    protected double calcularPrecioFinal() {
-        razonPrecioFinal = "sin descuento";
-        return precio;
-    }
-    
     public void agregarUnidades(int unidades) {
         cantidadDisponible += unidades;
     }
@@ -60,6 +54,12 @@ public abstract class Libro {
     public void vender(int unidades) {
         cantidadDisponible -= unidades;
         cantidadVendida += unidades;
+    }
+    
+    @Override
+    public double calcularPrecioFinal() {
+        razonPrecioFinal = "sin descuento";
+        return precio;
     }
     
     public abstract String obtenerInfoCreacion();

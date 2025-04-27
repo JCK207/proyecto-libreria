@@ -9,7 +9,7 @@ public class LibroFisico extends Libro {
     }
 
     @Override
-    protected double calcularPrecioFinal() {
+    public double calcularPrecioFinal() {
         double descuento = 0;
         razonPrecioFinal = "sin descuento";
         

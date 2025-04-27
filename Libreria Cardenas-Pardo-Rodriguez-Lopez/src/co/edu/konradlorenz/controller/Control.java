@@ -18,36 +18,30 @@ public class Control {
                     +"\n  Salir."
                     +"\nSeleccione una opción: ");
             switch (opcion) {
-                case "1":
-                //case "Agregar libro":
+                case "Agregar libro":
                     agregarLibroMenu();
                     break;
-                case "2":
-                //case "":
+                case "Agregar unidades a un libro":
                     if (!agregarUnidadesLibroMenu()) {
                         Ventana.mostrarTexto("Cancelación de Agregar unidades a un libro.");
                     }
                     break;
-                case "3":
-                //case "Retirar libro":
+                case "Retirar libro":
                     if (!retirarLibroMenu()) {
                         Ventana.mostrarTexto("Cancelación de Retirar libro.");
                     }
                     break;
-                case "4":
-                //case "Cambiar libro de posición":
+                case "Cambiar libro de posición":
                     if (!cambiarPosicionLibroMenu()) {
                         Ventana.mostrarTexto("Cancelación de Cambiar libro de posición.");
                     }
                     break;
-                case "5":
-                //case "Vender libro":
+                case "Vender libro":
                     if (!venderLibroMenu()) {
                         Ventana.mostrarTexto("Cancelación de Vender libro.");
                     }
                     break;
-                case "0":
-                //case "Salir":
+                case "Salir":
                     Ventana.mostrarTexto("Saliendo.");
                     break;
                 default: {
@@ -130,6 +124,8 @@ public class Control {
             Ventana.mostrarTexto(e.getMessage());
         } catch (IndexOutOfBoundsException e) {
             Ventana.mostrarTexto("El índice es inválido.");
+        } catch (Exception e) {
+            Ventana.mostrarTexto("Error inesperado: "+e.getMessage());
         } finally {
             return sinError;
         }
@@ -160,6 +156,8 @@ public class Control {
             Ventana.mostrarTexto(e.getMessage());
         } catch (IndexOutOfBoundsException e) {
             Ventana.mostrarTexto("El índice es inválido.");
+        } catch (Exception e) {
+            Ventana.mostrarTexto("Error inesperado: "+e.getMessage());
         } finally {
             return sinError;
         }
@@ -194,6 +192,8 @@ public class Control {
             Ventana.mostrarTexto(e.getMessage());
         } catch (IndexOutOfBoundsException e) {
             Ventana.mostrarTexto("Algún índice es inválido.");
+        } catch (Exception e) {
+            Ventana.mostrarTexto("Error inesperado: "+e.getMessage());
         } finally {
             return sinError;
         }
@@ -218,10 +218,7 @@ public class Control {
         try {
             indice = Integer.parseInt(info[0])-1;
             unidades = Integer.parseInt(info[1]);
-            //libro = libreria.getLibros()[indice];//
-            //Ventana.mostrarTexto(libro.toString());//
             libro = libreria.venderLibro(indice, unidades);
-            //Ventana.mostrarTexto(libro.toString());//
             
             sinError = true;
             Ventana.mostrarTexto("Se vendieron "+unidades+" unidades del libro "+(indice+1)+":"
@@ -234,10 +231,11 @@ public class Control {
             Ventana.mostrarTexto(e.getMessage());
         } catch (IndexOutOfBoundsException e) {
             Ventana.mostrarTexto("El índice es inválido.");
+        } catch (Exception e) {
+            Ventana.mostrarTexto("Error inesperado: "+e.getMessage());
         } finally {
             return sinError;
         }
-        
     }
     
     
@@ -260,12 +258,18 @@ public class Control {
         try {
             precio = Double.parseDouble(info[2]);
             peso = Double.parseDouble(info[3]);
+            if (precio<=0 || peso<=0) {
+                Ventana.mostrarTexto("Ningún número puede ser negativo");
+                return null;
+            }
+            return new LibroFisico(isbn, titulo, precio, peso);
         } catch (NumberFormatException e) {
             Ventana.mostrarTexto("Algún valor numérico es inválido.");
             return null;
+        } catch (Exception e) {
+            Ventana.mostrarTexto("Error inesperado: "+e.getMessage());
+            return null;
         }
-        
-        return new LibroFisico(isbn, titulo, precio, peso);
     }
     
     private Libro crearLibroDigital() {
@@ -287,12 +291,18 @@ public class Control {
         try {
             precio = Double.parseDouble(info[2]);
             tamanno = Double.parseDouble(info[4]);
+            if (precio<=0 || tamanno<=0) {
+                Ventana.mostrarTexto("Ningún número puede ser negativo");
+                return null;
+            }
+            return new LibroDigital(isbn, titulo, precio, formato, tamanno);
         } catch (NumberFormatException e) {
             Ventana.mostrarTexto("Algún valor numérico es inválido.");
             return null;
+        } catch (Exception e) {
+            Ventana.mostrarTexto("Error inesperado: "+e.getMessage());
+            return null;
         }
-        
-        return new LibroDigital(isbn, titulo, precio, formato, tamanno);
     }
     
     private Libro crearLibroColeccionable() {
@@ -320,18 +330,24 @@ public class Control {
         try {
             precio = Double.parseDouble(info[2]);
             peso = Double.parseDouble(info[3]);
+            if (precio<=0 || peso<=0) {
+                Ventana.mostrarTexto("Ningún número puede ser negativo");
+                return null;
+            }
             edAct = Integer.parseInt(aux[0]);
             edTot = Integer.parseInt(aux[1]);
             if (edAct<=0 || edTot<=0 || edAct>edTot) {
-                Ventana.mostrarTexto("La edición debe ser de 2 números naturales, el segundo mayor al primero");
+                Ventana.mostrarTexto("La edición debe ser de 2 números positivos, el segundo mayor al primero");
                 return null;
             }
+            return new LibroColeccionable(isbn, titulo, precio, peso, edAct, edTot);
         } catch (NumberFormatException e) {
             Ventana.mostrarTexto("Algún valor numérico es inválido.");
             return null;
+        } catch (Exception e) {
+            Ventana.mostrarTexto("Error inesperado: "+e.getMessage());
+            return null;
         }
-        
-        return new LibroColeccionable(isbn, titulo, precio, peso, edAct, edTot);
     }
     
     
